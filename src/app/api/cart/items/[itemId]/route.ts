@@ -3,8 +3,11 @@ import { prisma } from "@/lib/prisma";
 import { ObjectId } from "bson";
 
 // DELETE /api/cart/items/[itemId]
-export async function DELETE(req: NextRequest, { params }: any) {
-  const { itemId } = params;
+export async function DELETE(
+  req: NextRequest,
+  context: { params: Promise<{ itemId: string }> } // 👈 type must be Promise
+) {
+  const { itemId } = await context.params; // 👈 always await params
   console.log("DELETE CART ITEM API HIT", itemId);
 
   try {
@@ -16,10 +19,7 @@ export async function DELETE(req: NextRequest, { params }: any) {
       where: { id: itemId },
     });
 
-    return NextResponse.json(
-      { message: "Cart item deleted", deletedItem },
-      { status: 200 }
-    );
+    return NextResponse.json({ message: "Cart item deleted", deletedItem }, { status: 200 });
   } catch (error) {
     console.error("CART_ITEM_DELETE Error", error);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
@@ -27,8 +27,11 @@ export async function DELETE(req: NextRequest, { params }: any) {
 }
 
 // PUT /api/cart/items/[itemId]
-export async function PUT(req: NextRequest, { params }: any) {
-  const { itemId } = params;
+export async function PUT(
+  req: NextRequest,
+  context: { params: Promise<{ itemId: string }> }
+) {
+  const { itemId } = await context.params; // 👈 await again
   console.log("UPDATE CART ITEM API HIT", itemId);
 
   try {
@@ -43,10 +46,7 @@ export async function PUT(req: NextRequest, { params }: any) {
       data: { quantity },
     });
 
-    return NextResponse.json(
-      { message: "Cart item updated", updatedItem },
-      { status: 200 }
-    );
+    return NextResponse.json({ message: "Cart item updated", updatedItem }, { status: 200 });
   } catch (error) {
     console.error("CART_ITEM_UPDATE Error", error);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });

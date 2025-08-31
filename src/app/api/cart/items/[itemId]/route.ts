@@ -3,10 +3,7 @@ import { prisma } from "@/lib/prisma";
 import { ObjectId } from "bson";
 
 // DELETE /api/cart/items/[itemId]
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { itemId: string } }
-) {
+export async function DELETE(req: NextRequest, { params }: any) {
   const { itemId } = params;
   console.log("DELETE CART ITEM API HIT", itemId);
 
@@ -30,12 +27,8 @@ export async function DELETE(
 }
 
 // PUT /api/cart/items/[itemId]
-export async function PUT(
-  req: NextRequest,
-  { params }: 
-  { params: Promise<{ itemId: string }> }
-) {
-  const { itemId } = await params;
+export async function PUT(req: NextRequest, { params }: any) {
+  const { itemId } = params;
   console.log("UPDATE CART ITEM API HIT", itemId);
 
   try {

@@ -110,50 +110,49 @@ export default function ProductsPage() {
           ) : products.length === 0 ? (
             <p>No products available</p>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 items-stretch">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-14 items-stretch shadow-sm hover:shadow-lg">
   {products.map((product) => (
     <div
-      key={product.id}
-      className="border rounded-2xl flex flex-col justify-between overflow-hidden hover:shadow-lg transition cursor-pointer h-full min-h-[380px]"
-    >
-      <Link href={`/products/${product.id}`} className="flex-1">
-        <img
-          src={product.imageUrl}
-          alt={product.name}
-          className="w-full h-48 object-cover mb-4 rounded-lg"
-        />
-        <h2 className="text-xl px-2 font-semibold mb-2 line-clamp-2">
-          {product.name}
-        </h2>
-      </Link>
-
-      <div className="px-2">
-        <p className="font-bold">${product.price.toFixed(2)}</p>
-        <p
-          className={`text-sm ${
-            product.stock > 0 ? "text-green-600" : "text-red-600"
-          }`}
-        >
+    key={product.id}
+    className="border border-gray-200 rounded-xl flex flex-col overflow-hidden 
+               shadow-sm hover:shadow-md transition h-full bg-white"
+  >
+    <Link href={`/products/${product.id}`} className="flex-1">
+      <img
+        src={product.imageUrl}
+        alt={product.name}
+        className="w-full h-48 object-cover"
+      />
+      <div className="px-4 py-3">
+        <h2 className="text-lg font-semibold text-gray-900 line-clamp-1">{product.name}</h2>
+        <p className="text-sm text-gray-500 line-clamp-2 mt-1">{product.description}</p>
+        <p className="text-base font-bold text-gray-900 mt-2">${product.price.toFixed(2)}</p>
+        <p className={`text-xs mt-1 ${
+          product.stock > 0 ? "text-green-600" : "text-red-600"
+        }`}>
           {product.stock > 0 ? `In stock: ${product.stock}` : "Out of stock"}
         </p>
       </div>
-
-      <div className="px-2 py-2 mt-auto flex gap-2">
-        <button
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            addToCart(product.id);
-          }}
-          className="flex-1 bg-yellow-400 rounded-full text-white px-4 py-2 hover:bg-yellow-600 transition"
-        >
-          Add to Cart
-        </button>
-        <button className="flex-1 bg-green-500 rounded-full text-white px-4 py-2 hover:bg-green-700 transition">
-          Buy now
-        </button>
-      </div>
+    </Link>
+  
+    <div className="px-4 py-3 flex gap-2 border-t border-gray-100">
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          addToCart(product.id);
+        }}
+        className="flex-1 bg-black text-white rounded-lg px-4 py-2 text-sm font-medium hover:bg-gray-800 transition"
+      >
+        Add to Cart
+      </button>
+      <button
+        className="flex-1 border border-gray-300 text-gray-700 rounded-lg px-4 py-2 text-sm font-medium hover:bg-gray-50 transition"
+      >
+        Buy Now
+      </button>
     </div>
+  </div>
   ))}
 </div>
           )}

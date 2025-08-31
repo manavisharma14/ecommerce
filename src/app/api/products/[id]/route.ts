@@ -1,21 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ObjectId } from "bson"; // ✅ use bson to validate Mongo ObjectId
+import { ObjectId } from "bson";
 
+// ✅ GET /api/products/[id]
 export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  console.log("products/[id] GET API HIT", params.id);
+  const { id } = await params;
+  console.log("products/[id] GET API HIT", id);
 
   try {
-    // ✅ Validate ID before passing to Prisma
-    if (!ObjectId.isValid(params.id)) {
+    if (!ObjectId.isValid(id)) {
       return NextResponse.json({ message: "Invalid product ID" }, { status: 400 });
     }
 
     const product = await prisma.product.findUnique({
-      where: { id: params.id },
+      where: { id },
       select: {
         id: true,
         name: true,
@@ -37,25 +38,25 @@ export async function GET(
   }
 }
 
+// ✅ DELETE /api/products/[id]
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  console.log("products/[id] DELETE API HIT", params.id);
+  const { id } = await params;
+  console.log("products/[id] DELETE API HIT", id);
 
   try {
-    if (!ObjectId.isValid(params.id)) {
+    if (!ObjectId.isValid(id)) {
       return NextResponse.json({ message: "Invalid product ID" }, { status: 400 });
     }
 
-    // First delete related CartItems
     await prisma.cartItem.deleteMany({
-      where: { productId: params.id },
+      where: { productId: id },
     });
 
-    // Then delete the product
     const deletedProduct = await prisma.product.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json(deletedProduct, { status: 200 });

@@ -82,21 +82,21 @@ export async function GET(request: NextRequest) {
 }
 
 
-export async function DELETE(request: NextRequest, { params } : { params: {id : string}}){
-    console.log(" delete api hit")
-    try {
-      if(!ObjectId.isValid(params.id)){
-        return NextResponse.json({message: "Invalid product ID"}, {status: 400});
-      }
-      const deletedProduct = await prisma.product.delete({
-        where: {id: params.id}
+// export async function DELETE(request: NextRequest, { params } : { params: {id : string}}){
+//     console.log(" delete api hit")
+//     try {
+//       if(!ObjectId.isValid(params.id)){
+//         return NextResponse.json({message: "Invalid product ID"}, {status: 400});
+//       }
+//       const deletedProduct = await prisma.product.delete({
+//         where: {id: params.id}
 
-      })
-      return NextResponse.json(deletedProduct, {status: 200});
-    }
-    catch (error) {
-      console.error("PRODUCTS_ID_DELETE Error", error);
-      return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
-    }
+//       })
+//       return NextResponse.json(deletedProduct, {status: 200});
+//     }
+//     catch (error) {
+//       console.error("PRODUCTS_ID_DELETE Error", error);
+//       return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
+//     }
 
-}
+// }

@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { ObjectId } from "bson"; 
+import { ObjectId } from "bson";
 
 // DELETE /api/cart/items/[itemId]
 export async function DELETE(
   req: NextRequest,
-  context: { params: { itemId: string } }
+  { params }: { params: { itemId: string } }
 ) {
-  const { itemId } = context.params;
+  const { itemId } = params;
   console.log("DELETE CART ITEM API HIT", itemId);
 
   try {
@@ -32,9 +32,9 @@ export async function DELETE(
 // PUT /api/cart/items/[itemId]
 export async function PUT(
   req: NextRequest,
-  context: { params: { itemId: string } }
+  { params }: { params: { itemId: string } }
 ) {
-  const { itemId } = context.params;
+  const { itemId } = params;
   console.log("UPDATE CART ITEM API HIT", itemId);
 
   try {

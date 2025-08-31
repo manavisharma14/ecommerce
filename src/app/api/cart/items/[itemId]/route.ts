@@ -32,9 +32,10 @@ export async function DELETE(
 // PUT /api/cart/items/[itemId]
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { itemId: string } }
+  { params }: 
+  { params: Promise<{ itemId: string }> }
 ) {
-  const { itemId } = params;
+  const { itemId } = await params;
   console.log("UPDATE CART ITEM API HIT", itemId);
 
   try {

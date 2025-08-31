@@ -1,64 +1,41 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Trash2, Plus, Minus } from "lucide-react";
+import { Trash2, Plus, Minus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
 
-type Product = {
-    id: string;
-    name: string;
-    price: number;
-    imageUrl: string;
-};
-
-type CartItem = {
-    id: string;
-    quantity: number;
-    product: Product;
-};
+type Product = { id: string; name: string; price: number; imageUrl: string };
+type CartItem = { id: string; quantity: number; product: Product };
 
 export default function CartPage() {
-    const [items, setItems] = useState<CartItem[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [selected, setSelected] = useState("standard");
+  const [items, setItems] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState("standard");
+  const router = useRouter();
 
+  useEffect(() => {
+    const fetchCartItems = async () => {
+      const token = localStorage.getItem("token");
+      const res = await fetch("/api/cart", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setItems(data?.items || []);
+      }
+      setLoading(false);
+    };
+    fetchCartItems();
+  }, []);
     const options = [
         { id: "standard", label: "Standard", price: "Free" },
         { id: "express", label: "Express", price: "$5.00" },
         { id: "overnight", label: "Overnight", price: "$15.00" },
       ];
 
-    const router = useRouter();
+ 
 
-    useEffect(() => {
-        const fetchCartItems = async () => {
-            try {
-                const token = localStorage.getItem("token");
-
-                const response = await fetch('/api/cart', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // Include authentication headers if necessary
-                        'Authorization': `Bearer ${token}`,
-                    },
-                })
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log("Cart items:", data);
-                    setItems(data?.items || []);
-                } else {
-                    console.error("Failed to fetch cart items:", response.statusText);
-                }
-            } catch (error) {
-                console.error("Error fetching cart items:", error);
-            } finally {
-                setLoading(false);
-            }
-        }
-        fetchCartItems();
-    }, []);
+ 
 
     const deletdCartItem = async (itemId: string) => {
         try {

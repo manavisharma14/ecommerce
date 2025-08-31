@@ -1,29 +1,25 @@
+// app/api/cart/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import jwt from "jsonwebtoken";
-import { ObjectId } from "bson";
 
 export async function POST(request: NextRequest) {
-  console.log("CART_POST API HIT");
   try {
     const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!authHeader?.startsWith("Bearer ")) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
     const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: string };
-
     if (!decoded?.id) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = decoded.id;
     const { items } = await request.json();
 
-    // upsert cart (create if doesn't exist, otherwise update)
     const cart = await prisma.cart.upsert({
-      where: { userId }, // 👈 works now because userId is unique
+      where: { userId: decoded.id },
       update: {
         items: {
           create: items.map((item: any) => ({
@@ -33,7 +29,7 @@ export async function POST(request: NextRequest) {
         },
       },
       create: {
-        userId,
+        userId: decoded.id,
         items: {
           create: items.map((item: any) => ({
             product: { connect: { id: item.productId } },
@@ -41,9 +37,7 @@ export async function POST(request: NextRequest) {
           })),
         },
       },
-      include: {
-        items: { include: { product: true } },
-      },
+      include: { items: { include: { product: true } } },
     });
 
     return NextResponse.json(cart, { status: 201 });
@@ -54,49 +48,26 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  console.log("CART_GET API HIT");
-  try{
+  try {
     const authHeader = request.headers.get("authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    if (!authHeader?.startsWith("Bearer ")) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
+
     const token = authHeader.split(" ")[1];
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { id: string };
     if (!decoded?.id) {
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
-    const userId = decoded.id;
-    const carts = await prisma.cart.findUnique({
-      where: { userId },
-      include: {
-        items: { include: { product: true } },
-      },
-    });
-    return NextResponse.json(carts, { status: 200 });
 
-  }
-  catch(error){
-    console.error("Error fetching carts:", error);
+    const cart = await prisma.cart.findUnique({
+      where: { userId: decoded.id },
+      include: { items: { include: { product: true } } },
+    });
+
+    return NextResponse.json(cart, { status: 200 });
+  } catch (error) {
+    console.error("Error fetching cart:", error);
     return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
   }
 }
-
-
-// export async function DELETE(request: NextRequest, { params } : { params: {id : string}}){
-//     console.log(" delete api hit")
-//     try {
-//       if(!ObjectId.isValid(params.id)){
-//         return NextResponse.json({message: "Invalid product ID"}, {status: 400});
-//       }
-//       const deletedProduct = await prisma.product.delete({
-//         where: {id: params.id}
-
-//       })
-//       return NextResponse.json(deletedProduct, {status: 200});
-//     }
-//     catch (error) {
-//       console.error("PRODUCTS_ID_DELETE Error", error);
-//       return NextResponse.json({ message: "Internal Server Error" }, { status: 500 });
-//     }
-
-// }

@@ -200,7 +200,6 @@ export default function CartPage() {
       </div>
     </div>
 
-
                 <div className="flex flex-col gap-6 text-2xl justify-center ml-auto">
                     <p className="text-2xl font-bold"> ${items.reduce((total, item) => total + item.product.price * item.quantity, 0).toFixed(2)}</p>
                     <h1>Total</h1>

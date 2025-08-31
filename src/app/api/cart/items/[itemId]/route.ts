@@ -2,22 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { ObjectId } from "bson"; 
 
- 
-// DELETE /api/cart/:itemId
+// DELETE /api/cart/items/[itemId]
 export async function DELETE(
-  request: NextRequest,
-  { params }: { params: { itemId: string } }
+  req: NextRequest,
+  context: { params: { itemId: string } }
 ) {
-  console.log("DELETE CART ITEM API HIT", params.itemId);
+  const { itemId } = context.params;
+  console.log("DELETE CART ITEM API HIT", itemId);
 
   try {
-    if (!ObjectId.isValid(params.itemId)) {
+    if (!ObjectId.isValid(itemId)) {
       return NextResponse.json({ message: "Invalid cart item ID" }, { status: 400 });
     }
 
-    // delete from cartItem table
     const deletedItem = await prisma.cartItem.delete({
-      where: { id: params.itemId },
+      where: { id: itemId },
     });
 
     return NextResponse.json(
@@ -30,20 +29,26 @@ export async function DELETE(
   }
 }
 
+// PUT /api/cart/items/[itemId]
 export async function PUT(
-  request: NextRequest,
-  { params }: { params: { itemId: string } }
-){
-  console.log("update cart items api hit")
-  try{
-    const { quantity } = await request.json();
-    if (!ObjectId.isValid(params.itemId)) {
+  req: NextRequest,
+  context: { params: { itemId: string } }
+) {
+  const { itemId } = context.params;
+  console.log("UPDATE CART ITEM API HIT", itemId);
+
+  try {
+    const { quantity } = await req.json();
+
+    if (!ObjectId.isValid(itemId)) {
       return NextResponse.json({ message: "Invalid cart item ID" }, { status: 400 });
     }
+
     const updatedItem = await prisma.cartItem.update({
-      where: { id: params.itemId },
-      data: { quantity }
-    })
+      where: { id: itemId },
+      data: { quantity },
+    });
+
     return NextResponse.json(
       { message: "Cart item updated", updatedItem },
       { status: 200 }
